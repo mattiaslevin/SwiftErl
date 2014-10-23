@@ -404,6 +404,7 @@
 				CDD20F3D19F7A4D9004DB918 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		CDD20F3E19F7A4D9004DB918 /* Build configuration list for PBXNativeTarget "SwiftErlTests" */ = {
 			isa = XCConfigurationList;
@@ -412,6 +413,7 @@
 				CDD20F4019F7A4D9004DB918 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

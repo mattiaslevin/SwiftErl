@@ -86,7 +86,7 @@ public extension SequenceOf {
    :param: element element to delete
    :returns: a new sequence with the first element matching element deleted, if there is such an element
   */
-  public func delete<E: Equatable>(element: E) -> SequenceOf<T> {
+  public func delete<T: Equatable>(element: T) -> SequenceOf<T> {
     var generator = generate()
     var isFinished = false
     
@@ -94,7 +94,7 @@ public extension SequenceOf {
       
       var next = generator.next()
       if !isFinished {
-        if let unwrapped = next as? E {
+        if let unwrapped = next as? T {
           
           if unwrapped == element {
             isFinished = true
@@ -104,7 +104,7 @@ public extension SequenceOf {
         }
       }
       
-      return next
+      return next as? T
       
     })
     
@@ -440,10 +440,10 @@ public extension SequenceOf {
    :param: element the element to look for
    :returns: true if the element exists in the sequence
   */
-  public func member<E: Equatable>(element: E) -> Bool {
+  public func member<T: Equatable>(element: T) -> Bool {
     var generator = generate()
     
-    while let next = generator.next() as? E {
+    while let next = generator.next() as? T {
       if next == element {
         return true
       }
@@ -461,54 +461,7 @@ public extension SequenceOf {
   :returns: a merged sorted sequence
   */
   public func merge<U: Comparable>(sequence: SequenceOf<U>) -> SequenceOf<U> {
-    
-    var thisGenerator = generate()
-    var otherGenerator = sequence.generate()
-    
-    var pending: (element: U?, isFromThisSequence: Bool) = (nil, true)
-    
-    return SequenceOf<U>(GeneratorOf<U> {
-      
-      var thisElement: U?
-      var otherElement: U?
-      
-      if let pendingElement = pending.element {
-        
-        if pending.isFromThisSequence {
-          thisElement = pendingElement
-          otherElement = otherGenerator.next()
-        } else {
-          thisElement = thisGenerator.next() as U?
-          otherElement = pendingElement
-        }
-        
-      } else {
-        thisElement = thisGenerator.next() as U?
-        otherElement = otherGenerator.next()
-      }
-      
-      if thisElement == nil && otherElement == nil {
-        return nil
-      } else if thisElement == nil {
-        pending.element = nil
-        return otherElement
-      } else if otherElement == nil {
-        pending.element = nil
-        return thisElement
-      } else {
-        
-        if thisElement > otherElement {
-          pending = (otherElement, false)
-          return thisElement
-        } else {
-          pending = (thisElement, true)
-          return otherElement
-        }
-        
-      }
-      
-    })
-    
+    return merge(sequence, asUniqueMerge:false)
   }
   
   
@@ -623,12 +576,12 @@ public extension SequenceOf {
    :params: sequence the prefix sequence
    :returns: true if the provided sequence is a prefix of the current sequence. Otherwise false
   */
-  public func isPrefix<U: Equatable>(sequence: SequenceOf<U>) -> Bool {
+  public func isPrefix<T: Equatable>(sequence: SequenceOf<T>) -> Bool {
     var thisGenerator = generate()
     var otherGenerator = sequence.generate()
     
     while let otherNext = otherGenerator.next() {
-      if let thisNext = thisGenerator.next() as? U {
+      if let thisNext = thisGenerator.next() as? T {
         if otherNext != thisNext {
           return false
         }
@@ -732,7 +685,7 @@ public extension SequenceOf {
    :param: sequence
    :returns: true of the provided sequence is a suffix of the sequence
   */
-  public func isSuffix<E: Equatable>(sequence: SequenceOf<E>) -> Bool {
+  public func isSuffix<T: Equatable>(sequence: SequenceOf<T>) -> Bool {
     return reverse().isPrefix(sequence.reverse())
   }
   
@@ -777,11 +730,104 @@ public extension SequenceOf {
   }
   
   
-  // unmerge
+  /**
+   Unqiue merge. Return the sorted sequence by mergin the current sequence with the provided sequence. All sequences must be sorted and contain no duplicates. When two element compare equal, the element from the current sequence will be picked.
   
-  // unzip
+   :param: sequence the sequence to merge with
+   :returns: merged sorted sequence with unique elements
+  */
+  public func umerge<U: Comparable>(sequence: SequenceOf<U>) -> SequenceOf<U> {
+    return merge(sequence, asUniqueMerge:true)
+  }
+  
+  internal func merge<U: Comparable>(sequence: SequenceOf<U>, asUniqueMerge: Bool) -> SequenceOf<U> {
+    var thisGenerator = generate()
+    var otherGenerator = sequence.generate()
+    
+    var pending: (element: U?, isFromThisSequence: Bool) = (nil, true)
+    
+    return SequenceOf<U>(GeneratorOf<U> {
+      
+      var thisElement: U?
+      var otherElement: U?
+      
+      if let pendingElement = pending.element {
+        
+        if pending.isFromThisSequence {
+          thisElement = pendingElement
+          otherElement = otherGenerator.next()
+        } else {
+          thisElement = thisGenerator.next() as U?
+          otherElement = pendingElement
+        }
+        
+      } else {
+        thisElement = thisGenerator.next() as U?
+        otherElement = otherGenerator.next()
+      }
+      
+      println("this:\(thisElement) other:\(otherElement)")
+      
+      if thisElement == nil && otherElement == nil {
+        return nil
+      } else if thisElement == nil {
+        pending.element = nil
+        return otherElement
+      } else if otherElement == nil {
+        pending.element = nil
+        return thisElement
+      } else {
+        
+        if thisElement == otherElement {
+          pending = asUniqueMerge ? (nil, false) : (otherElement, false)
+          return thisElement
+        } else if thisElement > otherElement {
+          pending = (thisElement, true)
+          return otherElement
+        } else {
+          pending = (otherElement, false)
+          return thisElement
+        }
+        
+      }
+      
+    })
+    
+  }
+
+  
+
+  /**
+   Unzip a sequence of two-tuples into two separate sequences, where the the first sequence contains the first element of each tuple and the second sequence contains the second element of each tuple.
+  
+   :returns: Tuple with two sequences
+  */
+  // TODO Looks good but not possible to call
+  static func unzip<U, V>(sequence: SequenceOf<(U, V)>) -> (SequenceOf<U>, SequenceOf<V>) {
+    var firstGenerator = sequence.generate()
+    var secondGenerator = sequence.generate()
+
+    let firstSequence = SequenceOf<U>(GeneratorOf<U> {
+      if let (first, _) = firstGenerator.next() {
+        return first
+      } else {
+        return nil
+      }
+    })
+    
+    let secondSequence = SequenceOf<V>(GeneratorOf<V> {
+      if let (_, second) = secondGenerator.next() {
+        return second
+      } else {
+        return nil
+      }
+    })
+    
+    return (firstSequence, secondSequence)
+  }
   
   // unzip3
+  // TODO Wait with implementation until unzip works
   
   // unsort?
   
