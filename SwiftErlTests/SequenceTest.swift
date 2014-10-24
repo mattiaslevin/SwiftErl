@@ -399,7 +399,19 @@ class SequenceTest: XCTestCase {
     
     let tupleSeq = tuples.asSequence()
     // TODO Unsure why this is not workinf
-    //let test = SequenceOf.unzip(tupleSeq)
+    //let unzipped = SequenceOf.unzip(tupleSeq)
+    
+  }
+  
+  
+  func testZip() {
+    
+    let zipped = numbers.asSequence().zip(numbers.asSequence())
+    
+    for element in zipped {
+      let (first, second) = element
+      XCTAssertTrue(first == second)
+    }
     
   }
   

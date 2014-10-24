@@ -58,22 +58,14 @@ public extension SequenceOf {
   public func append(sequence: SequenceOf<T>) -> SequenceOf<T> {
     var thisGenerator = generate()
     var otherGenerator = sequence.generate()
-    var startAppending = false
     
     return SequenceOf<T>(GeneratorOf<T> {
       
-      var next: T?
-      if !startAppending {
-        next = thisGenerator.next()
-        if next == nil {
-          startAppending = true
-          next = otherGenerator.next()
-        }
+      if let next = thisGenerator.next() {
+        return next
       } else {
-        next = otherGenerator.next()
+        return otherGenerator.next()
       }
-      
-      return next
       
     })
     
@@ -803,7 +795,7 @@ public extension SequenceOf {
    :returns: Tuple with two sequences
   */
   // TODO Looks good but not possible to call
-  static func unzip<U, V>(sequence: SequenceOf<(U, V)>) -> (SequenceOf<U>, SequenceOf<V>) {
+  static public func unzip<U, V>(sequence: SequenceOf<(U, V)>) -> (SequenceOf<U>, SequenceOf<V>) {
     var firstGenerator = sequence.generate()
     var secondGenerator = sequence.generate()
 
@@ -831,13 +823,103 @@ public extension SequenceOf {
   
   // unsort?
   
-  // zip
+  /**
+   Zip two sequences of equal length into a sequence of two-tuples, where the first element in tuple is taken from the current sequence and the second element is taken from the provided sequence.
+   As soon as one of the sequences run out of elements the zipping will stop.
   
-  // zip3
+   :param: otherSequence a sequence to zip with
+   :returns: a sequence of two-tuples
+  */
+  public func zip<U>(otherSequence: SequenceOf<U>) -> SequenceOf<(T, U)> {
+    var thisGenerator = generate()
+    var otherGenerator = otherSequence.generate()
+
+    return SequenceOf<(T, U)>(GeneratorOf<(T, U)> {
+      
+      let thisElement = thisGenerator.next()
+      let otherElement = otherGenerator.next()
+      
+      if thisElement == nil || otherElement == nil {
+        return nil
+      } else {
+        return (thisElement!, otherElement!)
+      }
+      
+    })
+    
+  }
+
+  
+  /**
+   Zip three sequences of equal lenght into a sequence of three-tuples.
+   As soon as one of the sequences run out of elements the zipping will stop.
+  
+   :param: secondSequence a sequence to zip with
+   :param: thridSequence a sequence to zip with
+   :returns: a sequence of three-tuples
+  */
+  public func zi3p<U, V>(secondSequence: SequenceOf<U>, thridSequence: SequenceOf<V>) -> SequenceOf<(T, U, V)> {
+    var thisGenerator = generate()
+    var secondGenerator = secondSequence.generate()
+    var thridGenerator = thridSequence.generate()
+    
+    return SequenceOf<(T, U, V)>(GeneratorOf<(T, U, V)> {
+      
+      let thisElement = thisGenerator.next()
+      let secondElement = secondGenerator.next()
+      let thirdElement = thridGenerator.next()
+      
+      if thisElement == nil || secondElement == nil || thirdElement == nil {
+        return nil
+      } else {
+        return (thisElement!, secondElement!, thirdElement!)
+      }
+      
+    })
+    
+  }
   
   // zipwith
+  public func zipWith<U, V>(combine: (T, U) -> V, otherSequence: SequenceOf<U>) -> SequenceOf<V> {
+    var thisGenerator = generate()
+    var otherGenerator = otherSequence.generate()
+
+    return SequenceOf<V>(GeneratorOf<V> {
+      
+      let thisElement = thisGenerator.next()
+      let otherElement = otherGenerator.next()
+
+      if thisElement == nil || otherElement == nil {
+        return nil
+      } else {
+        return combine(thisElement!, otherElement!)
+      }
+      
+    })
+    
+  }
   
   // zipwith3
+  public func zip3With<S, U, V>(combine: (T, U, V) -> S, secondSequence: SequenceOf<U>, thirdSequence: SequenceOf<V>) -> SequenceOf<S> {
+    var thisGenerator = generate()
+    var secondGenerator = secondSequence.generate()
+    var thirdGenerator = thirdSequence.generate()
+    
+    return SequenceOf<S>(GeneratorOf<S> {
+      
+      let thisElement = thisGenerator.next()
+      let secondElement = secondGenerator.next()
+      let thirdElement = thirdGenerator.next()
+      
+      if thisElement == nil || secondElement == nil || thirdElement == nil {
+        return nil
+      } else {
+        return combine(thisElement!, secondElement!, thirdElement!)
+      }
+      
+    })
+    
+  }
   
   
   /**
