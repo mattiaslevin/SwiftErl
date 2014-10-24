@@ -115,6 +115,7 @@ public extension SequenceOf {
     return SequenceOf<T>(GeneratorOf<T> {
       
       if next != nil {
+        
         let ahead = generator.next()
         if ahead != nil {
           let temp = next
@@ -233,7 +234,7 @@ public extension SequenceOf {
   
   /**
    Create a new sequence containing elements for which function return a new mapped value.
-   This method is the same as first filering a sequence then applying a map function to the filtered sequence combines in one single method.
+   This method is the same as first filtering a sequence then applying a map function to the filtered sequence combined in one single method.
   
    :param: function function to call for each element
    :returns: new sequence containing elements for which function return a new mapped value
@@ -256,7 +257,7 @@ public extension SequenceOf {
   }
   
   
-  // flatten, flatmap?
+  // TODO flatten, flatmap?
   
   
   /**
@@ -788,7 +789,6 @@ public extension SequenceOf {
   }
 
   
-
   /**
    Unzip a sequence of two-tuples into two separate sequences, where the the first sequence contains the first element of each tuple and the second sequence contains the second element of each tuple.
   
@@ -818,10 +818,14 @@ public extension SequenceOf {
     return (firstSequence, secondSequence)
   }
   
+  
   // unzip3
   // TODO Wait with implementation until unzip works
   
-  // unsort?
+  
+  // usort? (unique sort)
+  // Maybe not applicable to sequences
+  
   
   /**
    Zip two sequences of equal length into a sequence of two-tuples, where the first element in tuple is taken from the current sequence and the second element is taken from the provided sequence.

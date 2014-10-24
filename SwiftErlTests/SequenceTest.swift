@@ -399,7 +399,7 @@ class SequenceTest: XCTestCase {
     
     let tupleSeq = tuples.asSequence()
     // TODO Unsure why this is not workinf
-    //let unzipped = SequenceOf.unzip(tupleSeq)
+    //let unzipped: (SequenceOf<Int>, SequenceOf<String>) = SequenceOf.unzip(tupleSeq)
     
   }
   
