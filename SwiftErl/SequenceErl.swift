@@ -453,12 +453,54 @@ public extension SequenceOf {
   :param: sequence the sequence to merge
   :returns: a merged sorted sequence
   */
-  public func merge<U: Comparable>(sequence: SequenceOf<U>) -> SequenceOf<U> {
+  public func merge<T: Comparable>(sequence: SequenceOf<T>) -> SequenceOf<T> {
     return merge(sequence, asUniqueMerge:false)
   }
   
   
   // merge3
+  public func merge3<T: Comparable>(secondSequence: SequenceOf<T>, thirdSequence: SequenceOf<T>) -> SequenceOf<T> {
+    var thisGenerator = generate()
+    var secondGenerator = secondSequence.generate()
+    var thirdGenerator = thirdSequence.generate()
+    
+    var pendingThis: T?
+    var pendingSecond: T?
+    var pendingThird: T?
+    
+    return SequenceOf<T>(GeneratorOf<T> {
+      
+      if pendingThis == nil {
+        pendingThis = thisGenerator.next() as? T
+      }
+      if pendingSecond == nil {
+        pendingSecond = secondGenerator.next()
+      }
+      if pendingThis == nil {
+        pendingThird = thirdGenerator.next()
+      }
+      
+      if pendingThis != nil && pendingThis < pendingSecond {
+        
+        if (pendingThis < pendingThird) {
+          pendingThis = nil
+          return pendingThis!
+        } else {
+          pendingThird = nil
+          return pendingThird!
+        }
+        
+      } else if pendingSecond != nil && pendingSecond < pendingThird {
+        pendingSecond = nil
+        return pendingSecond!
+      } else {
+        pendingThird = nil
+        return pendingThird!
+      }
+      
+    })
+    
+  }
   
   
   /**
@@ -862,16 +904,16 @@ public extension SequenceOf {
    :param: thridSequence a sequence to zip with
    :returns: a sequence of three-tuples
   */
-  public func zi3p<U, V>(secondSequence: SequenceOf<U>, thridSequence: SequenceOf<V>) -> SequenceOf<(T, U, V)> {
+  public func zip3<U, V>(secondSequence: SequenceOf<U>, thirdSequence: SequenceOf<V>) -> SequenceOf<(T, U, V)> {
     var thisGenerator = generate()
     var secondGenerator = secondSequence.generate()
-    var thridGenerator = thridSequence.generate()
+    var thirdGenerator = thirdSequence.generate()
     
     return SequenceOf<(T, U, V)>(GeneratorOf<(T, U, V)> {
       
       let thisElement = thisGenerator.next()
       let secondElement = secondGenerator.next()
-      let thirdElement = thridGenerator.next()
+      let thirdElement = thirdGenerator.next()
       
       if thisElement == nil || secondElement == nil || thirdElement == nil {
         return nil

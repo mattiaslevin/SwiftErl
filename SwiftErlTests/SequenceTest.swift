@@ -416,6 +416,38 @@ class SequenceTest: XCTestCase {
   }
   
   
+  func testZip3() {
+    
+    let zipped = numbers.asSequence().zip3(numbers.asSequence(), thirdSequence:numbers.asSequence())
+
+    for element in zipped {
+      let (first, second, third) = element
+      XCTAssert(first == second && second == third)
+    }
+    
+  }
+  
+  
+  func testZipWith() {
+    
+    let zipped = numbers.asSequence().zipWith( { $0 + $1 }, otherSequence: numbers.asSequence())
+    
+    for (i, element) in enumerate(zipped) {
+      XCTAssert( element == (i + 1) + (i + 1) )
+    }
+    
+  }
+  
+  
+  func testZip3With() {
+    
+    let zipped = numbers.asSequence().zip3With( { $0 + $1 + $2 }, secondSequence: numbers.asSequence(), thirdSequence: numbers.asSequence())
+    
+    for (i, element) in enumerate(zipped) {
+      XCTAssert( element == (i + 1) + (i + 1) + (i + 1) )
+    }
+    
+  }
   
   
 }
