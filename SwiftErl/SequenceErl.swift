@@ -925,7 +925,13 @@ public extension SequenceOf {
     
   }
   
-  // zipwith
+  
+  /**
+   Combine the elements of two sequences of equal length into one single sequence.
+  
+   :param: combine combine each pair of elements to a single element
+   :returns: sequence of combined elements
+  */
   public func zipWith<U, V>(combine: (T, U) -> V, otherSequence: SequenceOf<U>) -> SequenceOf<V> {
     var thisGenerator = generate()
     var otherGenerator = otherSequence.generate()
@@ -945,7 +951,13 @@ public extension SequenceOf {
     
   }
   
-  // zipwith3
+  
+  /**
+  Combine the elements of three sequences of equal length into one single sequence.
+  
+  :param: combine combine each tripple of elements to a single element
+  :returns: sequence of combined elements
+  */
   public func zip3With<S, U, V>(combine: (T, U, V) -> S, secondSequence: SequenceOf<U>, thirdSequence: SequenceOf<V>) -> SequenceOf<S> {
     var thisGenerator = generate()
     var secondGenerator = secondSequence.generate()
