@@ -79,17 +79,13 @@ class SequenceTest: XCTestCase {
   
   func testDelete() {
     
-    var sequence1 = numbers.asSequence().delete(1)
-    XCTAssertFalse(sequence1.any { $0 == 1} )
+    XCTAssertFalse(numbers.asSequence().delete(1).any { $0 == 1} )
     
-    sequence1 = numbers.asSequence().delete(5)
-    XCTAssertFalse(sequence1.any { $0 == 5} )
+    XCTAssertFalse(numbers.asSequence().delete(5).any { $0 == 5} )
     
-    sequence1 = numbers.asSequence().delete(9)
-    XCTAssertFalse(sequence1.any { $0 == 9} )
+    XCTAssertFalse(numbers.asSequence().delete(9).any { $0 == 9} )
     
-    sequence1 = numbers.asSequence().delete(12)
-    XCTAssertTrue(sequence1.asArray().count == numbers.count)
+    XCTAssertTrue(numbers.asSequence().delete(12).asArray().count == numbers.count)
 
     XCTAssertTrue(empty.asSequence().delete("ABC").asArray().count == 0)
     XCTAssertTrue(empty.asSequence().delete("").asArray().count == 0)
@@ -138,11 +134,9 @@ class SequenceTest: XCTestCase {
   
   func testfilter() {
     
-    let evens = numbers.asSequence().filter { $0 % 2 == 0}
-    XCTAssertEqual(Array(evens), [2, 4, 6, 8])
+    XCTAssertEqual(numbers.asSequence().filter( { $0 % 2 == 0} ).asArray(), [2, 4, 6, 8])
     
-    let emptySequence = empty.asSequence().filter { $0.isEmpty }
-    XCTAssertTrue(emptySequence.asArray().count == 0)
+    XCTAssertTrue(empty.asSequence().filter( { $0.isEmpty } ).asArray().count == 0)
     
   }
   
@@ -162,6 +156,10 @@ class SequenceTest: XCTestCase {
       XCTAssertTrue(string == reference[index])
     }
     
+    
+    let nothing = empty.asSequence().filtermap { String($0) }
+    XCTAssertTrue(nothing.asArray().count == 0)
+    
   }
   
   
@@ -175,6 +173,9 @@ class SequenceTest: XCTestCase {
     
     XCTAssertTrue(sum == 5)
     
+    let nothing = [Int]().asSequence().foldl(0, { $0 + $1 })
+    XCTAssertTrue(nothing == 0)
+    
   }
   
   
@@ -183,10 +184,13 @@ class SequenceTest: XCTestCase {
     var add = false
     let sum = numbers.asSequence().foldr(0, function: {
       add = !add
-      return add ? $0 + $1 : $0 - $1
+      return add ? $0 + $1 : $0
     })
     
-    XCTAssertTrue(sum == 5)
+    XCTAssertTrue(sum == 25)
+    
+    let nothing = [Int]().asSequence().foldr(0, { $0 + $1 })
+    XCTAssertTrue(nothing == 0)
     
   }
   
@@ -194,8 +198,10 @@ class SequenceTest: XCTestCase {
   func testForeach() {
     
     var sum = 0
-    numbers.asSequence().foreach( { sum += Int($0) } )
+    numbers.asSequence().foreach { sum += Int($0) }
     XCTAssertTrue(sum == 45)
+    
+//    numbers.asSequence().foreach { // }
     
   }
   
