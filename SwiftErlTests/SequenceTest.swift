@@ -71,6 +71,9 @@ class SequenceTest: XCTestCase {
     appendedSequence = [Int]().asSequence().append(sequence1)
     XCTAssertTrue(appendedSequence.asArray().count == sequence1.asArray().count)
     
+    appendedSequence = [Int]().asSequence().append([Int]().asSequence())
+    XCTAssertTrue(appendedSequence.asArray().count == 0)
+    
   }
   
   
@@ -87,7 +90,8 @@ class SequenceTest: XCTestCase {
     
     sequence1 = numbers.asSequence().delete(12)
     XCTAssertTrue(sequence1.asArray().count == numbers.count)
-    
+
+    XCTAssertTrue(empty.asSequence().delete("ABC").asArray().count == 0)
     XCTAssertTrue(empty.asSequence().delete("").asArray().count == 0)
     
   }
@@ -107,11 +111,11 @@ class SequenceTest: XCTestCase {
     
     let numbers = [4, 2, 5, 6, 1, 2, 3]
     
-    var numbers1 = numbers.asSequence().dropwhile { $0 <= 5 }
-    XCTAssertTrue(numbers1.asArray().count == 4)
+    XCTAssertTrue(numbers.asSequence().dropwhile( { $0 <= 5 } ).asArray().count == 4)
     
-    numbers1 = numbers.asSequence().dropwhile { $0 <= 3 }
-    XCTAssertTrue(numbers1.asArray().count == numbers.count)
+    XCTAssertTrue(numbers.asSequence().dropwhile( { $0 <= 3 } ).asArray().count == numbers.count)
+    
+    XCTAssertTrue(empty.asSequence().dropwhile( {$0 == "A"} ).asArray().count == 0)
     
   }
   
