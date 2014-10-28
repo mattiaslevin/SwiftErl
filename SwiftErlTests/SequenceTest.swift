@@ -13,7 +13,8 @@ class SequenceTest: XCTestCase {
   
   let strings = Array(count: 10, repeatedValue: "A")
   let numbers = Array(1..<10)
-  let empty = [String]()
+  let emptyStrings = [String]()
+  let emptyNumbers = [Int]()
   
   
   override func setUp() {
@@ -34,7 +35,7 @@ class SequenceTest: XCTestCase {
     strings2.append("B")
     XCTAssertFalse(strings2.asSequence().all { $0 == "A"} )
     
-    XCTAssertTrue(empty.asSequence().all {$0 == "A"} )
+    XCTAssertTrue(emptyStrings.asSequence().all {$0 == "A"} )
     
   }
   
@@ -46,7 +47,7 @@ class SequenceTest: XCTestCase {
     XCTAssertFalse(numbers.asSequence().any {$0 == 12} )
     XCTAssertFalse(numbers.asSequence().any {$0 == "A"} )
     
-    XCTAssertFalse(empty.asSequence().any { $0 == "A"} )
+    XCTAssertFalse(emptyStrings.asSequence().any { $0 == "A"} )
     
   }
   
@@ -65,13 +66,13 @@ class SequenceTest: XCTestCase {
       XCTAssertTrue(appendedArray[index] == index + 1)
     }
     
-    appendedSequence = sequence1.append([Int]().asSequence())
+    appendedSequence = sequence1.append(emptyNumbers.asSequence())
     XCTAssertTrue(appendedSequence.asArray().count == sequence1.asArray().count)
     
-    appendedSequence = [Int]().asSequence().append(sequence1)
+    appendedSequence = emptyNumbers.asSequence().append(sequence1)
     XCTAssertTrue(appendedSequence.asArray().count == sequence1.asArray().count)
     
-    appendedSequence = [Int]().asSequence().append([Int]().asSequence())
+    appendedSequence = emptyNumbers.asSequence().append(emptyNumbers.asSequence())
     XCTAssertTrue(appendedSequence.asArray().count == 0)
     
   }
@@ -87,8 +88,8 @@ class SequenceTest: XCTestCase {
     
     XCTAssertTrue(numbers.asSequence().delete(12).asArray().count == numbers.count)
 
-    XCTAssertTrue(empty.asSequence().delete("ABC").asArray().count == 0)
-    XCTAssertTrue(empty.asSequence().delete("").asArray().count == 0)
+    XCTAssertTrue(emptyStrings.asSequence().delete("ABC").asArray().count == 0)
+    XCTAssertTrue(emptyStrings.asSequence().delete("").asArray().count == 0)
     
   }
   
@@ -98,7 +99,7 @@ class SequenceTest: XCTestCase {
     XCTAssertTrue(numbers.count == 9)
     XCTAssertTrue(numbers.asSequence().droplast().asArray().count == 8)
     
-    XCTAssertTrue(empty.asSequence().droplast().asArray().count == 0)
+    XCTAssertTrue(emptyStrings.asSequence().droplast().asArray().count == 0)
     
   }
   
@@ -111,7 +112,7 @@ class SequenceTest: XCTestCase {
     
     XCTAssertTrue(numbers.asSequence().dropwhile( { $0 <= 3 } ).asArray().count == numbers.count)
     
-    XCTAssertTrue(empty.asSequence().dropwhile( {$0 == "A"} ).asArray().count == 0)
+    XCTAssertTrue(emptyStrings.asSequence().dropwhile( {$0 == "A"} ).asArray().count == 0)
     
   }
   
@@ -136,7 +137,7 @@ class SequenceTest: XCTestCase {
     
     XCTAssertEqual(numbers.asSequence().filter( { $0 % 2 == 0} ).asArray(), [2, 4, 6, 8])
     
-    XCTAssertTrue(empty.asSequence().filter( { $0.isEmpty } ).asArray().count == 0)
+    XCTAssertTrue(emptyStrings.asSequence().filter( { $0.isEmpty } ).asArray().count == 0)
     
   }
   
@@ -157,7 +158,7 @@ class SequenceTest: XCTestCase {
     }
     
     
-    let nothing = empty.asSequence().filtermap { String($0) }
+    let nothing = emptyStrings.asSequence().filtermap { String($0) }
     XCTAssertTrue(nothing.asArray().count == 0)
     
   }
@@ -173,7 +174,7 @@ class SequenceTest: XCTestCase {
     
     XCTAssertTrue(sum == 5)
     
-    let nothing = [Int]().asSequence().foldl(0, { $0 + $1 })
+    let nothing = emptyNumbers.asSequence().foldl(0, { $0 + $1 })
     XCTAssertTrue(nothing == 0)
     
   }
@@ -189,7 +190,7 @@ class SequenceTest: XCTestCase {
     
     XCTAssertTrue(sum == 25)
     
-    let nothing = [Int]().asSequence().foldr(0, { $0 + $1 })
+    let nothing = emptyNumbers.asSequence().foldr(0, { $0 + $1 })
     XCTAssertTrue(nothing == 0)
     
   }
@@ -201,7 +202,10 @@ class SequenceTest: XCTestCase {
     numbers.asSequence().foreach { sum += Int($0) }
     XCTAssertTrue(sum == 45)
     
-//    numbers.asSequence().foreach { // }
+    emptyStrings.asSequence().foreach {
+      println($0)
+      XCTAssertTrue(false)
+    }
     
   }
   
@@ -210,12 +214,7 @@ class SequenceTest: XCTestCase {
     
     XCTAssertTrue(numbers.asSequence().last() == 9)
     
-    if let last = empty.asSequence().last() {
-      XCTAssertTrue(false)
-    } else {
-      XCTAssertTrue(true)
-    }
-    
+    emptyStrings.asSequence().last() == nil ? XCTAssertTrue(true) : XCTAssertTrue(false)
   }
   
   
@@ -223,13 +222,10 @@ class SequenceTest: XCTestCase {
     
     XCTAssertTrue(numbers.asSequence().first() == 1)
     
-    if let last = empty.asSequence().first() {
-      XCTAssertTrue(false)
-    } else {
-      XCTAssertTrue(true)
-    }
+    emptyStrings.asSequence().first() == nil ? XCTAssertTrue(true) : XCTAssertTrue(true)
     
   }
+  
   
   func testMap() {
     
@@ -240,12 +236,14 @@ class SequenceTest: XCTestCase {
       XCTAssertTrue(string == reference[index])
     }
     
+    XCTAssertTrue(emptyNumbers.asSequence().map( { String($0) } ).asArray().count == 0)
+    
   }
   
   
   func testMapfoldr() {
     
-    var (sequence: SequenceOf<Int>, accumulator: Int) = numbers.asSequence().mapfoldl(0, function: { (element, accumulator) in
+    let (sequence: SequenceOf<Int>, accumulator: Int) = numbers.asSequence().mapfoldl(0, function: { (element, accumulator) in
       return (element * 2, accumulator + element)
     })
     
@@ -254,6 +252,13 @@ class SequenceTest: XCTestCase {
       XCTAssertTrue(number == (index + 1) * 2)
     }
     
+    var (s2: SequenceOf<Int>, a2: Int) = emptyNumbers.asSequence().mapfoldl(0, function: { (element, accumulator) in
+      return (element * 2, accumulator + element)
+    })
+    
+    XCTAssertTrue(a2 == 0)
+    XCTAssertTrue(s2.asArray().count == 0)
+    
   }
   
   
@@ -261,7 +266,7 @@ class SequenceTest: XCTestCase {
     
     XCTAssertTrue(numbers.asSequence().max() == 9)
     
-    let max: Int? = empty.asSequence().max()
+    let max: Int? = emptyNumbers.asSequence().max()
     XCTAssertTrue(max == nil)
     
     
@@ -272,7 +277,7 @@ class SequenceTest: XCTestCase {
     
     XCTAssertTrue(numbers.asSequence().min() == 1)
     
-    let min: Int? = empty.asSequence().min()
+    let min: Int? = emptyNumbers.asSequence().min()
     XCTAssertTrue(min == nil)
     
   }
@@ -284,7 +289,7 @@ class SequenceTest: XCTestCase {
     
     XCTAssertFalse(numbers.asSequence().member(20))
     
-    XCTAssertFalse(empty.asSequence().member("AAA"))
+    XCTAssertFalse(emptyStrings.asSequence().member("AAA"))
     
   }
   
