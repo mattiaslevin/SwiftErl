@@ -153,10 +153,7 @@ class SequenceTest: XCTestCase {
     }
     
     let reference = ["2", "4", "6", "8"]
-    for (index, string) in enumerate(evens) {
-      XCTAssertTrue(string == reference[index])
-    }
-    
+    XCTAssertTrue(hasSameElements(evens, array: reference))
     
     let nothing = emptyStrings.asSequence().filtermap { String($0) }
     XCTAssertTrue(nothing.asArray().count == 0)
@@ -232,9 +229,7 @@ class SequenceTest: XCTestCase {
     let strings = numbers.asSequence().map { String($0) }
     
     let reference = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-    for (index, string) in enumerate(strings) {
-      XCTAssertTrue(string == reference[index])
-    }
+    XCTAssertTrue(hasSameElements (strings, array: reference))
     
     XCTAssertTrue(emptyNumbers.asSequence().map( { String($0) } ).asArray().count == 0)
     
@@ -262,13 +257,33 @@ class SequenceTest: XCTestCase {
   }
   
   
+  func testMapfoldl() {
+    
+    let (sequence: SequenceOf<Int>, accumulator: Int) = numbers.asSequence().mapfoldl(0, function: { (element, accumulator) in
+      return (element % 2 == 0 ? element * 2 : element, accumulator + element)
+    })
+    
+    XCTAssertTrue(accumulator == 45)
+    for (index, number) in enumerate(sequence) {
+      XCTAssertTrue( number == ((index + 1) % 2 == 0 ? ((index + 1) * 2) : index + 1) )
+    }
+    
+    var (s2: SequenceOf<Int>, a2: Int) = emptyNumbers.asSequence().mapfoldl(0, function: { (element, accumulator) in
+      return (element * 2, accumulator + element)
+    })
+    
+    XCTAssertTrue(a2 == 0)
+    XCTAssertTrue(s2.asArray().count == 0)
+    
+  }
+
+  
   func testMax() {
     
     XCTAssertTrue(numbers.asSequence().max() == 9)
     
     let max: Int? = emptyNumbers.asSequence().max()
     XCTAssertTrue(max == nil)
-    
     
   }
   
@@ -299,12 +314,22 @@ class SequenceTest: XCTestCase {
     let evenNumbers = [2, 4, 6, 8]
     let oddNumbers = [1, 3, 5, 7, 9]
     
-    let mergedNumbers = evenNumbers.asSequence().merge(oddNumbers.asSequence())
+    var mergedNumbers = evenNumbers.asSequence().merge(oddNumbers.asSequence())
     
+    XCTAssertTrue(mergedNumbers.asArray().count == 9)
     for (index, element) in enumerate(mergedNumbers) {
       XCTAssertTrue(element == index + 1)
     }
     
+    let shortList = [2, 20]
+    mergedNumbers = oddNumbers.asSequence().merge(shortList.asSequence())
+    
+    XCTAssertTrue(mergedNumbers.asArray().count == 7)
+    let reference = [1, 2, 3, 5, 7, 9, 20]
+    XCTAssertTrue(hasSameElements(mergedNumbers, array: reference))
+    
+    // TODO
+  
   }
   
   
@@ -461,6 +486,19 @@ class SequenceTest: XCTestCase {
     for (i, element) in enumerate(zipped) {
       XCTAssert( element == (i + 1) + (i + 1) + (i + 1) )
     }
+    
+  }
+  
+  
+  private func hasSameElements<T: Equatable>(sequence: SequenceOf<T>, array: [T]) -> Bool {
+    
+    for (index, element) in enumerate(sequence) {
+      if element != array[index] {
+        return false
+      }
+    }
+    
+    return true
     
   }
   
