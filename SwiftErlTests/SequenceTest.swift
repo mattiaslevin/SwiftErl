@@ -117,20 +117,27 @@ class SequenceTest: XCTestCase {
   }
   
   
-  // TODO For some reason the init method is not working
-  //  func testDuplicate() {
-  //
-  //    let strings = SequenceOf.duplicate("ABC", times: 10)
-  //
-  //    var count = 0
-  //    for string in strings {
-  //      XCTAssertTrue(string == "ABC")
-  //      count++
-  //    }
-  //
-  //    XCTAssertTrue(count == 10)
-  //
-  //  }
+  func testDuplicateFunc() {
+    
+    let strings = SequenceOf.duplicate("ABC", times: 10)
+    
+    XCTAssertTrue(strings.asArray().count == 10)
+    XCTAssertTrue(strings.all { $0 == "ABC"}  )
+    
+    let emptyStrings = SequenceOf.duplicate("DEF", times: 0)
+    XCTAssertTrue(emptyStrings.asArray().count == 0)
+    
+  }
+  
+  
+  func testDuplicateInit() {
+    
+    let strings = SequenceOf(count: 10, repeatedValue: "ABC")
+    
+    XCTAssertTrue(strings.asArray().count == 10)
+    XCTAssertTrue(strings.all { $0 == "ABC"}  )
+    
+  }
   
   
   func testfilter() {
